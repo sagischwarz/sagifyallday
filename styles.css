@@ -9,8 +9,8 @@
   --color-secondary-hover: #d9d9d9;
   
   /* Button colors */
-  --color-solutions: #3498db;
-  --color-solutions-hover: #2980b9;
+  --color-solutions: #27ae60;
+  --color-solutions-hover: #219955;
   
   /* Status colors */
   --color-error: #ff0000;
@@ -187,7 +187,6 @@ button:active {
 .solutions-btn {
   background-color: var(--color-solutions);
   color: white;
-  margin-top: 20px;
 }
 .solutions-btn:hover {
   background-color: var(--color-solutions-hover);
@@ -195,9 +194,12 @@ button:active {
 
 .buttons-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 10px;
+  justify-content: center;
   align-items: center;
+  margin-top: 20px;
 }
 
 .reset-btn {
@@ -300,5 +302,8 @@ button:active {
     width: 50px;
     height: 50px;
     font-size: 20px;
+  }
+  .buttons-container {
+    flex-direction: column;
   }
 }
