@@ -95,9 +95,14 @@ h1 {
     ". d ."
     "e . f"
     ". g .";
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
   width: 300px;
   height: 300px;
-  margin: 20px 0;
+  margin: 20px auto;
+  place-items: center;
+  justify-content: center;
+  align-content: center;
 }
 .cell {
   width: 60px;
@@ -109,9 +114,10 @@ h1 {
   font-weight: bold;
   border-radius: 50%;
   cursor: pointer;
-  margin: 5px;
+  margin: 0;
   user-select: none;
   transition: transform 0.1s;
+  place-self: center;
 }
 .cell:hover {
   transform: scale(1.05);
