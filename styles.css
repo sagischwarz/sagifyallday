@@ -72,6 +72,7 @@ h1 {
   border: 1px solid var(--color-border);
   border-radius: 5px;
   font-family: inherit;
+  color: var(--color-primary-text);
 }
 .date-picker-container button {
   padding: 5px 10px;
@@ -156,6 +157,7 @@ h1 {
   margin-bottom: 20px;
 }
 button {
+  color: var(--color-primary-text);
   background-color: var(--color-primary);
   border: none;
   padding: 8px 16px;
