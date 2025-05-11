@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wortify All Day - Party Never</title>
-    <!-- Added meta tag to prevent caching, so new puzzle loads every day -->
     <meta
       http-equiv="Cache-Control"
       content="no-cache, no-store, must-revalidate"
@@ -22,7 +21,6 @@
         <div class="date-picker-container">
           <label for="puzzle-date">Puzzle wählen: </label>
           <input type="date" id="puzzle-date" name="puzzle-date" />
-          <button id="load-date-btn">Laden</button>
         </div>
         <p id="no-puzzle-message" class="error-message" style="display: none">
           Für dieses Datum ist kein Rätsel verfügbar.
@@ -69,7 +67,6 @@
       <div class="found-words">
         <h3>Gefundene Wörter: <span id="found-count">0</span></h3>
         <div class="words-container" id="words-container">
-          <!-- Gefundene Wörter werden hier hinzugefügt -->
         </div>
       </div>
       <div class="buttons-container">
@@ -123,19 +120,11 @@
       const scoreFill = document.querySelector(".score-fill");
       const messageEl = document.querySelector(".message");
       const datePickerEl = document.getElementById("puzzle-date");
-      const loadDateBtn = document.getElementById("load-date-btn");
       const noPuzzleMessageEl = document.getElementById("no-puzzle-message");
 
       loadPuzzlesFromFile()
         .then(() => {
           initGame();
-
-          loadDateBtn.addEventListener("click", () => {
-            const selectedDate = datePickerEl.value;
-            if (selectedDate) {
-              initGame(selectedDate);
-            }
-          });
 
           datePickerEl.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
@@ -146,7 +135,14 @@
             }
           });
           
-          // Add event listeners for reset and delete buttons
+          datePickerEl.addEventListener("change", () => {
+            const selectedDate = datePickerEl.value;
+            if (selectedDate) {
+              initGame(selectedDate);
+              datePickerEl.blur();
+            }
+          });
+          
           document.getElementById("reset-day-btn").addEventListener("click", resetCurrentDayProgress);
           document.getElementById("delete-all-btn").addEventListener("click", deleteAllSavedData);
 
@@ -242,18 +238,15 @@
       function resetCurrentDayProgress() {
         if (gameState.currentPuzzle) {
           const dateString = gameState.currentPuzzle.date;
-          // Get existing states
           let allGameStates = {};
           const savedStates = localStorage.getItem("wortifyGameStates");
           if (savedStates) {
             allGameStates = JSON.parse(savedStates);
-            // Remove entry for current date
             if (allGameStates[dateString]) {
               delete allGameStates[dateString];
               localStorage.setItem("wortifyGameStates", JSON.stringify(allGameStates));
             }
           }
-          // Reset game
           initGame(dateString);
           showMessage("Fortschritt für diesen Tag zurückgesetzt", "success");
         }
@@ -262,7 +255,6 @@
       function deleteAllSavedData() {
         if (confirm("Bist du sicher, dass du den Fortschritt für alle Tage löschen möchtest?")) {
           localStorage.removeItem("wortifyGameStates");
-          // Reset current game
           if (gameState.currentPuzzle) {
             initGame(gameState.currentPuzzle.date);
           } else {
