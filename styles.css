@@ -192,6 +192,26 @@ button:active {
 .solutions-btn:hover {
   background-color: var(--color-solutions-hover);
 }
+
+.buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.reset-btn {
+  background-color: #ff9800;
+  color: white;
+}
+.reset-btn:hover {
+  background-color: #e08600;
+}
+
+.delete-all-btn {
+  background-color: #f44336;
+  color: white;
+}
 .found-words {
   width: 100%;
   max-width: 500px;

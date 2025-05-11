@@ -72,12 +72,18 @@
           <!-- Gefundene Wörter werden hier hinzugefügt -->
         </div>
       </div>
-      <div>
+      <div class="buttons-container">
         <button
           class="solutions-btn"
           onclick="window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank')"
         >
           Lösungen
+        </button>
+        <button id="reset-day-btn" class="reset-btn">
+          Fortschritt zurücksetzen
+        </button>
+        <button id="delete-all-btn" class="delete-all-btn">
+          Alle Daten löschen
         </button>
       </div>
     </div>
@@ -139,6 +145,10 @@
               }
             }
           });
+          
+          // Add event listeners for reset and delete buttons
+          document.getElementById("reset-day-btn").addEventListener("click", resetCurrentDayProgress);
+          document.getElementById("delete-all-btn").addEventListener("click", deleteAllSavedData);
 
           if (gameConfig.puzzles.length > 0) {
             const sortedPuzzles = [...gameConfig.puzzles].sort(
@@ -173,7 +183,7 @@
             .trim()
             .split("\n")
             .map((line) => line.trim().toUpperCase())
-            .filter((word) => word && !word.startsWith("//")); // Remove empty lines and comments
+            .filter((word) => word && !word.startsWith("//"));
 
           puzzleLines.forEach((line) => {
             const [date, letters] = line.split(":");
@@ -181,7 +191,7 @@
               gameConfig.puzzles.push({
                 date: date,
                 letters: letters,
-                pangrams: [], // Will be populated later with matching words
+                pangrams: [],
               });
             }
           });
@@ -200,6 +210,68 @@
         }
       }
 
+      function saveGameStateToLocalStorage(dateString) {
+        let allGameStates = {};
+        const savedStates = localStorage.getItem("wortifyGameStates");
+        
+        if (savedStates) {
+          allGameStates = JSON.parse(savedStates);
+        }
+        
+        allGameStates[dateString] = {
+          foundWords: gameState.foundWords,
+          currentScore: gameState.currentScore
+        };
+        
+        localStorage.setItem("wortifyGameStates", JSON.stringify(allGameStates));
+      }
+      
+      function loadGameStateFromLocalStorage(dateString) {
+        const savedStates = localStorage.getItem("wortifyGameStates");
+        if (savedStates) {
+          const allGameStates = JSON.parse(savedStates);
+          
+          if (allGameStates[dateString]) {
+            console.log(`Loading saved state for ${dateString}:`, allGameStates[dateString]);
+            return allGameStates[dateString];
+          }
+        }
+        return null;
+      }
+      
+      function resetCurrentDayProgress() {
+        if (gameState.currentPuzzle) {
+          const dateString = gameState.currentPuzzle.date;
+          // Get existing states
+          let allGameStates = {};
+          const savedStates = localStorage.getItem("wortifyGameStates");
+          if (savedStates) {
+            allGameStates = JSON.parse(savedStates);
+            // Remove entry for current date
+            if (allGameStates[dateString]) {
+              delete allGameStates[dateString];
+              localStorage.setItem("wortifyGameStates", JSON.stringify(allGameStates));
+            }
+          }
+          // Reset game
+          initGame(dateString);
+          showMessage("Fortschritt für diesen Tag zurückgesetzt", "success");
+        }
+      }
+      
+      function deleteAllSavedData() {
+        if (confirm("Bist du sicher, dass du den Fortschritt für alle Tage löschen möchtest?")) {
+          localStorage.removeItem("wortifyGameStates");
+          // Reset current game
+          if (gameState.currentPuzzle) {
+            initGame(gameState.currentPuzzle.date);
+          } else {
+            initGame();
+          }
+          showMessage("Alle gespeicherten Daten wurden gelöscht", "success");
+        }
+      }
+      
       function resetGameState() {
         gameState.validWords = [];
         gameState.foundWords = [];
@@ -293,6 +365,19 @@
         updateHiveDisplay();
         generateValidWords();
         calculateMaxScoreAndRanks();
+        
+        const savedState = loadGameStateFromLocalStorage(dateString);
+
+        if (savedState) {
+          gameState.foundWords = savedState.foundWords;
+          gameState.currentScore = savedState.currentScore;
+          
+          gameState.foundWords.forEach(word => {
+            const isPangramWord = isPangram(word);
+            addWordToUI(word, isPangramWord);
+          });
+        }
+        
         updateScoreDisplay();
 
         if (!selectedDate) {
@@ -487,6 +572,9 @@
         addWordToUI(word, isPangramWord);
 
         updateScoreDisplay();
+        
+        const dateString = gameState.currentPuzzle.date;
+        saveGameStateToLocalStorage(dateString);
 
         if (isPangramWord) {
           showMessage("Pangramm! +" + wordScore + " Punkte", "pangram-message");
