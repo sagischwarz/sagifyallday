@@ -40,6 +40,32 @@
             color: #777;
             margin-top: 5px;
         }
+        .date-picker-container {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .date-picker-container input[type="date"] {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+        }
+        .date-picker-container button {
+            padding: 5px 10px;
+            background-color: #f721b0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .error-message {
+            color: #ff0000;
+            font-weight: bold;
+            margin-top: 10px;
+        }
         .hive {
             display: grid;
             grid-template-areas:
@@ -234,6 +260,12 @@
         <div class="info">
             <p>Finde die Wörter du Kackb00n. Nimm die Mitte mit!</p>
             <p id="current-date" class="date-display"></p>
+            <div class="date-picker-container">
+                <label for="puzzle-date">Puzzle wählen: </label>
+                <input type="date" id="puzzle-date" name="puzzle-date">
+                <button id="load-date-btn">Laden</button>
+            </div>
+            <p id="no-puzzle-message" class="error-message" style="display:none;">Für dieses Datum ist kein Rätsel verfügbar.</p>
         </div>
         
         <div class="hive">
@@ -312,9 +344,36 @@
         const maxScoreEl = document.getElementById('max-score');
         const scoreFill = document.querySelector('.score-fill');
         const messageEl = document.querySelector('.message');
+        const datePickerEl = document.getElementById('puzzle-date');
+        const loadDateBtn = document.getElementById('load-date-btn');
+        const noPuzzleMessageEl = document.getElementById('no-puzzle-message');
 
         loadPuzzlesFromFile().then(() => {
             initGame();
+            
+            loadDateBtn.addEventListener('click', () => {
+                const selectedDate = datePickerEl.value;
+                if (selectedDate) {
+                    initGame(selectedDate);
+                }
+            });
+            
+            datePickerEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const selectedDate = datePickerEl.value;
+                    if (selectedDate) {
+                        initGame(selectedDate);
+                    }
+                }
+            });
+            
+            if (gameConfig.puzzles.length > 0) {
+                const sortedPuzzles = [...gameConfig.puzzles].sort((a, b) => 
+                    new Date(a.date) - new Date(b.date)
+                );
+                datePickerEl.min = sortedPuzzles[0].date;
+                datePickerEl.max = sortedPuzzles[sortedPuzzles.length - 1].date;
+            }
         }).catch(error => {
             console.error("Error loading puzzles:", error);
             showMessage('Fehler beim Laden der Rätsel', 'error');
@@ -363,28 +422,69 @@
             }
         }
 
-        function initGame() {
-            const today = new Date();
+        function resetGameState() {
+            gameState.validWords = [];
+            gameState.foundWords = [];
+            gameState.currentScore = 0;
+            gameState.maxScore = 0;
+            gameState.pangrams = [];
+            
+            wordsContainer.innerHTML = '';
+            foundCountEl.textContent = '0';
+            currentScoreEl.textContent = '0';
+            maxScoreEl.textContent = '0';
+            scoreFill.style.width = '0%';
+            wordInput.value = '';
+        }
+        
+        function initGame(selectedDate = null) {
+            resetGameState();
+            
+            const today = selectedDate ? new Date(selectedDate) : new Date();
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
             const day = String(today.getDate()).padStart(2, '0');
-            const todayString = `${year}-${month}-${day}`;
+            const dateString = `${year}-${month}-${day}`;
             
-            let todaysPuzzle = gameConfig.puzzles.find(puzzle => puzzle.date === todayString);
+            if (!selectedDate) {
+                datePickerEl.value = dateString;
+            }
             
-            if (!todaysPuzzle) {
+            let selectedPuzzle = gameConfig.puzzles.find(puzzle => puzzle.date === dateString);
+            
+            if (!selectedPuzzle && !selectedDate) {
                 console.log("Kein Rätsel für heute gefunden, verwende ein alternatives Rätsel");
                 
                 const sortedPuzzles = [...gameConfig.puzzles].sort((a, b) => 
                     new Date(a.date) - new Date(b.date)
                 );
                 
-                todaysPuzzle = sortedPuzzles.reverse().find(puzzle => 
+                selectedPuzzle = sortedPuzzles.reverse().find(puzzle => 
                     new Date(puzzle.date) <= today
                 ) || sortedPuzzles[0];
             }
             
-            gameState.currentPuzzle = todaysPuzzle;
+            if (!selectedPuzzle) {
+                console.log("Kein Rätsel für das gewählte Datum verfügbar");
+                document.querySelector('.hive').style.display = 'none';
+                document.querySelector('.input-area').style.display = 'none';
+                document.querySelector('.score-section').style.display = 'none';
+                document.querySelector('.found-words').style.display = 'none';
+                noPuzzleMessageEl.style.display = 'block';
+                
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const germanDate = today.toLocaleDateString('de-DE', options);
+                document.getElementById('current-date').textContent = germanDate;
+                return;
+            }
+            
+            document.querySelector('.hive').style.display = 'grid';
+            document.querySelector('.input-area').style.display = 'flex';
+            document.querySelector('.score-section').style.display = 'flex';
+            document.querySelector('.found-words').style.display = 'block';
+            noPuzzleMessageEl.style.display = 'none';
+            
+            gameState.currentPuzzle = selectedPuzzle;
             
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const germanDate = today.toLocaleDateString('de-DE', options);
@@ -394,16 +494,14 @@
             gameState.outerLetters = gameState.currentPuzzle.letters.slice(1).split('');
             
             shuffleOuterLetters();
-            
             updateHiveDisplay();
-            
             generateValidWords();
-            
             calculateMaxScoreAndRanks();
-            
             updateScoreDisplay();
             
-            setupEventListeners();
+            if (!selectedDate) {
+                setupEventListeners();
+            }
         }
 
         function generateValidWords() {
