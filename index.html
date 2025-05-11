@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wortify All Day - Party Never</title>
+    <!-- Added meta tag to prevent caching, so new puzzle loads every day -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #f721b0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+        }
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .info {
+            color: #555;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .date-display {
+            font-size: 14px;
+            color: #777;
+            margin-top: 5px;
+        }
+        .hive {
+            display: grid;
+            grid-template-areas:
+                ". a ."
+                "b . c"
+                ". d ."
+                "e . f"
+                ". g .";
+            width: 300px;
+            height: 300px;
+            margin: 20px 0;
+        }
+        .cell {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 50%;
+            cursor: pointer;
+            margin: 5px;
+            user-select: none;
+            transition: transform 0.1s;
+        }
+        .cell:hover {
+            transform: scale(1.05);
+        }
+        .cell:active {
+            transform: scale(0.95);
+        }
+        .center {
+            background-color: #f721b0;
+            color: #333;
+        }
+        .outer {
+            background-color: #e6e6e6;
+            color: #333;
+        }
+        .input-area {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        #word-input {
+            font-size: 24px;
+            border: none;
+            background-color: transparent;
+            text-align: center;
+            border-bottom: 2px solid #ddd;
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #word-input:focus {
+            outline: none;
+            border-bottom-color: #f721b0;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #f721b0;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #e6ca20;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .delete-btn {
+            background-color: #e6e6e6;
+        }
+        .delete-btn:hover {
+            background-color: #d9d9d9;
+        }
+        .shuffle-btn {
+            background-color: #e6e6e6;
+        }
+        .shuffle-btn:hover {
+            background-color: #d9d9d9;
+        }
+        .found-words {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
+        }
+        .found-words h3 {
+            color: #555;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .words-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .word-item {
+            background-color: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            color: #333;
+        }
+        .pangram {
+            background-color: #f721b0;
+            font-weight: bold;
+        }
+        .score-section {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .score-bar {
+            width: 100%;
+            background-color: #e6e6e6;
+            height: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            position: relative;
+        }
+        .score-fill {
+            height: 100%;
+            background-color: #f721b0;
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+        .ranks {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #888;
+        }
+        .message {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .error {
+            background-color: #ffdddd;
+            color: #ff0000;
+        }
+        .success {
+            background-color: #ddffdd;
+            color: #00aa00;
+        }
+        .pangram-message {
+            background-color: #fff2cc;
+            color: #856404;
+        }
+        .visible {
+            opacity: 1;
+        }
+        @media (max-width: 600px) {
+            .hive {
+                width: 250px;
+                height: 250px;
+            }
+            .cell {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Wortify All Day - Party Never</h1>
+    <div class="game-container">
+        <div class="info">
+            <p>Finde die Wörter du Kackb00n. Nimm die Mitte mit!</p>
+            <p id="current-date" class="date-display"></p>
+        </div>
+        
+        <div class="hive">
+            <div class="cell outer" style="grid-area: a;"></div>
+            <div class="cell outer" style="grid-area: b;"></div>
+            <div class="cell outer" style="grid-area: c;"></div>
+            <div class="cell center" style="grid-area: d;"></div>
+            <div class="cell outer" style="grid-area: e;"></div>
+            <div class="cell outer" style="grid-area: f;"></div>
+            <div class="cell outer" style="grid-area: g;"></div>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="word-input" readonly>
+            <div class="buttons">
+                <button class="delete-btn">Löschen</button>
+                <button class="submit-btn">Eingabe</button>
+                <button class="shuffle-btn">Mischen</button>
+            </div>
+        </div>
+        
+        <div class="message"></div>
+        
+        <div class="score-section">
+            <div>Punkte: <span id="current-score">0</span> / <span id="max-score">0</span></div>
+            <div class="score-bar">
+                <div class="score-fill"></div>
+            </div>
+            <div class="ranks">
+                <span>Git Gud!</span>
+                <span>Naja...</span>
+                <span>Schon okay</span>
+                <span>Sagi</span>
+            </div>
+        </div>
+        
+        <div class="found-words">
+            <h3>Gefundene Wörter: <span id="found-count">0</span></h3>
+            <div class="words-container" id="words-container">
+                <!-- Gefundene Wörter werden hier hinzugefügt -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gameConfig = {
+            puzzles: []
+        };
+
+        const gameState = {
+            currentPuzzle: null,
+            centerLetter: '',
+            outerLetters: [],
+            validWords: [],
+            foundWords: [],
+            maxScore: 0,
+            currentScore: 0,
+            ranks: {
+                beginner: 0,
+                good: 0,
+                excellent: 0,
+                genius: 0
+            }
+        };
+
+        const cells = document.querySelectorAll('.cell');
+        const centerCell = document.querySelector('.center');
+        const outerCells = document.querySelectorAll('.outer');
+        const wordInput = document.getElementById('word-input');
+        const deleteBtn = document.querySelector('.delete-btn');
+        const submitBtn = document.querySelector('.submit-btn');
+        const shuffleBtn = document.querySelector('.shuffle-btn');
+        const wordsContainer = document.getElementById('words-container');
+        const foundCountEl = document.getElementById('found-count');
+        const currentScoreEl = document.getElementById('current-score');
+        const maxScoreEl = document.getElementById('max-score');
+        const scoreFill = document.querySelector('.score-fill');
+        const messageEl = document.querySelector('.message');
+
+        loadPuzzlesFromFile().then(() => {
+            initGame();
+        }).catch(error => {
+            console.error("Error loading puzzles:", error);
+            showMessage('Fehler beim Laden der Rätsel', 'error');
+        });
+
+        async function loadPuzzlesFromFile() {
+            try {
+                const puzzleResponse = await fetch('puzzles.txt');
+                if (!puzzleResponse.ok) {
+                    throw new Error(`HTTP error! Status: ${puzzleResponse.status}`);
+                }
+                
+                const puzzleText = await puzzleResponse.text();
+                const puzzleLines = puzzleText.trim().split('\n');
+                
+                const wordResponse = await fetch('woerter_de.txt');
+                if (!wordResponse.ok) {
+                    throw new Error(`HTTP error! Status: ${wordResponse.status}`);
+                }
+                
+                const wordText = await wordResponse.text();
+                const germanWordList = wordText.trim().split('\n')
+                    .map(line => line.trim().toUpperCase())
+                    .filter(word => word && !word.startsWith('//'));  // Remove empty lines and comments
+                
+                puzzleLines.forEach(line => {
+                    const [date, letters] = line.split(':');
+                    if (date && letters) {
+                        gameConfig.puzzles.push({
+                            date: date,
+                            letters: letters,
+                            pangrams: [] // Will be populated later with matching words
+                        });
+                    }
+                });
+                
+                if (gameConfig.puzzles.length === 0) {
+                    throw new Error("Keine Rätsel in der Datei gefunden");
+                }
+                
+                gameConfig.germanWordList = germanWordList;
+                
+            } catch (error) {
+                console.error("Error loading puzzles:", error);
+                alert("Probleme beim Laden der Rätsel. Sprich mit Sagi und sag ihm: " + error.message);
+            }
+        }
+
+        function initGame() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const todayString = `${year}-${month}-${day}`;
+            
+            let todaysPuzzle = gameConfig.puzzles.find(puzzle => puzzle.date === todayString);
+            
+            if (!todaysPuzzle) {
+                console.log("Kein Rätsel für heute gefunden, verwende ein alternatives Rätsel");
+                
+                const sortedPuzzles = [...gameConfig.puzzles].sort((a, b) => 
+                    new Date(a.date) - new Date(b.date)
+                );
+                
+                todaysPuzzle = sortedPuzzles.reverse().find(puzzle => 
+                    new Date(puzzle.date) <= today
+                ) || sortedPuzzles[0];
+            }
+            
+            gameState.currentPuzzle = todaysPuzzle;
+            
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const germanDate = today.toLocaleDateString('de-DE', options);
+            document.getElementById('current-date').textContent = germanDate;
+            
+            gameState.centerLetter = gameState.currentPuzzle.letters[0];
+            gameState.outerLetters = gameState.currentPuzzle.letters.slice(1).split('');
+            
+            shuffleOuterLetters();
+            
+            updateHiveDisplay();
+            
+            generateValidWords();
+            
+            calculateMaxScoreAndRanks();
+            
+            updateScoreDisplay();
+            
+            setupEventListeners();
+        }
+
+        function generateValidWords() {
+            const centerLetter = gameState.centerLetter.toUpperCase();
+            const puzzleLetters = (centerLetter + gameState.outerLetters.join('')).toUpperCase();
+            
+            const validWords = gameConfig.germanWordList.filter(word => {
+                if (word.length < 4) return false;
+                
+                if (!word.includes(centerLetter)) return false;
+                
+                for (const letter of word) {
+                    if (!puzzleLetters.includes(letter)) return false;
+                }
+                
+                return true;
+            });
+            
+            const pangrams = validWords.filter(word => {
+                const uniqueLetters = [...new Set(word.split(''))];
+                return [...new Set(puzzleLetters.split(''))].every(letter => 
+                    uniqueLetters.includes(letter)
+                );
+            });
+            
+            gameState.validWords = validWords;
+            
+            gameState.pangrams = pangrams;
+            
+            console.log(`Found ${validWords.length} valid words including ${pangrams.length} pangrams`);
+        }
+
+        function calculateMaxScoreAndRanks() {
+            let totalScore = 0;
+            
+            gameState.validWords.forEach(word => {
+                totalScore += calculateWordScore(word);
+            });
+            
+            gameState.maxScore = totalScore;
+            maxScoreEl.textContent = totalScore;
+            
+            gameState.ranks.beginner = Math.floor(totalScore * 0.2);
+            gameState.ranks.good = Math.floor(totalScore * 0.4);
+            gameState.ranks.excellent = Math.floor(totalScore * 0.6);
+            gameState.ranks.genius = Math.floor(totalScore * 0.8);
+        }
+
+        function calculateWordScore(word) {
+            let score = 0;
+            
+            if (word.length === 4) {
+                score = 1;
+            } else if (word.length > 4) {
+                score = word.length;
+            }
+            
+            if (isPangram(word)) {
+                score += 7;
+            }
+            
+            return score;
+        }
+
+        function isPangram(word) {
+            if (gameState.pangrams && gameState.pangrams.includes(word.toUpperCase())) {
+                return true;
+            }
+            
+            const allLetters = (gameState.centerLetter + gameState.outerLetters.join('')).toUpperCase();
+            const wordLetters = [...new Set(word.toUpperCase())];
+            
+            return allLetters.split('').every(letter => wordLetters.includes(letter));
+        }
+
+        function shuffleOuterLetters() {
+            for (let i = gameState.outerLetters.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [gameState.outerLetters[i], gameState.outerLetters[j]] = 
+                [gameState.outerLetters[j], gameState.outerLetters[i]];
+            }
+        }
+
+        function updateHiveDisplay() {
+            centerCell.textContent = gameState.centerLetter;
+            
+            outerCells.forEach((cell, index) => {
+                if (index < gameState.outerLetters.length) {
+                    cell.textContent = gameState.outerLetters[index];
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            cells.forEach(cell => {
+                cell.addEventListener('click', () => {
+                    if (cell.textContent) {
+                        wordInput.value += cell.textContent;
+                    }
+                });
+            });
+            
+            deleteBtn.addEventListener('click', () => {
+                wordInput.value = wordInput.value.slice(0, -1);
+            });
+            
+            submitBtn.addEventListener('click', submitWord);
+            
+            shuffleBtn.addEventListener('click', () => {
+                shuffleOuterLetters();
+                updateHiveDisplay();
+            });
+            
+            document.addEventListener('keydown', handleKeyDown);
+        }
+
+        function handleKeyDown(e) {
+            const key = e.key.toUpperCase();
+            const allLetters = gameState.centerLetter.toUpperCase() + 
+                              gameState.outerLetters.join('').toUpperCase();
+            
+            if (e.key === 'Backspace') {
+                wordInput.value = wordInput.value.slice(0, -1);
+            } else if (e.key === 'Enter') {
+                submitWord();
+            } else if (allLetters.includes(key)) {
+                wordInput.value += key;
+            }
+        }
+
+        function submitWord() {
+            const word = wordInput.value.trim().toUpperCase();
+            
+            wordInput.value = '';
+            
+            if (word.length < 4) {
+                showMessage('Wörter müssen mindestens 4 Buchstaben lang sein', 'error');
+                return;
+            }
+            
+            if (!word.includes(gameState.centerLetter.toUpperCase())) {
+                showMessage('Wörter müssen den mittleren Buchstaben enthalten', 'error');
+                return;
+            }
+            
+            if (gameState.foundWords.includes(word)) {
+                showMessage('Du hast dieses Wort bereits gefunden', 'error');
+                return;
+            }
+            
+            if (!gameState.validWords.includes(word)) {
+                showMessage('Nicht in der Wortliste', 'error');
+                return;
+            }
+            
+            gameState.foundWords.push(word);
+            
+            const wordScore = calculateWordScore(word);
+            gameState.currentScore += wordScore;
+            
+            const isPangramWord = isPangram(word);
+            
+            addWordToUI(word, isPangramWord);
+            
+            updateScoreDisplay();
+            
+            if (isPangramWord) {
+                showMessage('Pangramm! +' + wordScore + ' Punkte', 'pangram-message');
+            } else {
+                showMessage('Gut! +' + wordScore + ' Punkte', 'success');
+            }
+            
+            if (gameState.foundWords.length === gameState.validWords.length) {
+                showMessage('Glückwunsch! Du hast alle Wörter gefunden!', 'success');
+            }
+        }
+
+        function addWordToUI(word, isPangram) {
+            const wordElement = document.createElement('div');
+            wordElement.classList.add('word-item');
+            if (isPangram) {
+                wordElement.classList.add('pangram');
+            }
+            wordElement.textContent = word;
+            wordsContainer.appendChild(wordElement);
+            
+            foundCountEl.textContent = gameState.foundWords.length;
+        }
+
+        function updateScoreDisplay() {
+            currentScoreEl.textContent = gameState.currentScore;
+            
+            const percentage = (gameState.currentScore / gameState.maxScore) * 100;
+            scoreFill.style.width = `${percentage}%`;
+        }
+
+        function showMessage(text, messageType) {
+            messageEl.textContent = text;
+            messageEl.className = 'message ' + messageType + ' visible';
+            
+            setTimeout(() => {
+                messageEl.classList.remove('visible');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
