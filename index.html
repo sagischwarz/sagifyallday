@@ -22,6 +22,7 @@
           <label for="puzzle-date">Puzzle wählen: </label>
           <input type="date" id="puzzle-date" name="puzzle-date" />
           <button id="prev-date-btn" class="date-nav-btn">&#9664;</button>
+          <button id="today-date-btn" class="date-nav-btn">Heute</button>
           <button id="next-date-btn" class="date-nav-btn">&#9654;</button>
         </div>
         <p id="no-puzzle-message" class="error-message" style="display: none">
@@ -168,6 +169,13 @@
               datePickerEl.value = currentDate.toISOString().split("T")[0];
               initGame(datePickerEl.value);
             }
+          });
+
+          document.getElementById("today-date-btn").addEventListener("click", () => {
+            const today = new Date();
+            const todayString = today.toISOString().split("T")[0];
+            datePickerEl.value = todayString;
+            initGame(todayString);
           });
 
           if (gameConfig.puzzles.length > 0) {
