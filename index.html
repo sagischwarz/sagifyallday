@@ -21,6 +21,8 @@
         <div class="date-picker-container">
           <label for="puzzle-date">Puzzle wählen: </label>
           <input type="date" id="puzzle-date" name="puzzle-date" />
+          <button id="prev-date-btn" class="date-nav-btn">&#9664;</button>
+          <button id="next-date-btn" class="date-nav-btn">&#9654;</button>
         </div>
         <p id="no-puzzle-message" class="error-message" style="display: none">
           Für dieses Datum ist kein Rätsel verfügbar.
@@ -149,6 +151,24 @@
           document.getElementById("reset-day-btn").addEventListener("click", resetCurrentDayProgress);
           document.getElementById("delete-all-btn").addEventListener("click", deleteAllSavedData);
           document.getElementById("copy-words-btn").addEventListener("click", copyFoundWordsToClipboard);
+
+          document.getElementById("prev-date-btn").addEventListener("click", () => {
+            const currentDate = new Date(datePickerEl.value);
+            if (!isNaN(currentDate)) {
+              currentDate.setDate(currentDate.getDate() - 1);
+              datePickerEl.value = currentDate.toISOString().split("T")[0];
+              initGame(datePickerEl.value);
+            }
+          });
+
+          document.getElementById("next-date-btn").addEventListener("click", () => {
+            const currentDate = new Date(datePickerEl.value);
+            if (!isNaN(currentDate)) {
+              currentDate.setDate(currentDate.getDate() + 1);
+              datePickerEl.value = currentDate.toISOString().split("T")[0];
+              initGame(datePickerEl.value);
+            }
+          });
 
           if (gameConfig.puzzles.length > 0) {
             const sortedPuzzles = [...gameConfig.puzzles].sort(

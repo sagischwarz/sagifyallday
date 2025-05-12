@@ -198,6 +198,22 @@ button:active {
   background-color: var(--color-solutions-hover);
 }
 
+.date-nav-btn {
+  background-color: var(--color-secondary);
+  color: var(--color-primary-text);
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.date-nav-btn:hover {
+  background-color: var(--color-secondary-hover);
+}
+
 .buttons-container {
   display: flex;
   flex-direction: row;
