@@ -76,6 +76,9 @@
         >
           Lösungen
         </button>
+        <button id="copy-words-btn" class="copy-btn">
+          Wörter kopieren
+        </button>
         <button id="reset-day-btn" class="reset-btn">
           Fortschritt zurücksetzen
         </button>
@@ -145,6 +148,7 @@
           
           document.getElementById("reset-day-btn").addEventListener("click", resetCurrentDayProgress);
           document.getElementById("delete-all-btn").addEventListener("click", deleteAllSavedData);
+          document.getElementById("copy-words-btn").addEventListener("click", copyFoundWordsToClipboard);
 
           if (gameConfig.puzzles.length > 0) {
             const sortedPuzzles = [...gameConfig.puzzles].sort(
@@ -596,6 +600,27 @@
 
         const percentage = (gameState.currentScore / gameState.maxScore) * 100;
         scoreFill.style.width = `${percentage}%`;
+      }
+      
+      function copyFoundWordsToClipboard() {
+        if (gameState.foundWords.length === 0) {
+          showMessage("Keine Wörter zum Kopieren gefunden", "error");
+          return;
+        }
+        
+        // Sort words alphabetically for better readability
+        const sortedWords = [...gameState.foundWords].sort();
+        const textToCopy = sortedWords.join(' ');
+        
+        // Use the clipboard API to copy the text
+        navigator.clipboard.writeText(textToCopy)
+          .then(() => {
+            showMessage(`${gameState.foundWords.length} Wörter in die Zwischenablage kopiert`, "success");
+          })
+          .catch(err => {
+            console.error('Fehler beim Kopieren: ', err);
+            showMessage("Fehler beim Kopieren der Wörter", "error");
+          });
       }
 
       function showMessage(text, messageType) {
