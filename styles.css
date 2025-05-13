@@ -1,26 +1,21 @@
 :root {
-  /* Primary colors */
   --color-primary: #f721b0;
   --color-primary-hover: #ff5dc8;
   --color-primary-text: #333;
-  
-  /* Secondary colors */
+
   --color-secondary: #e6e6e6;
   --color-secondary-hover: #d9d9d9;
-  
-  /* Button colors */
+
   --color-solutions: #27ae60;
   --color-solutions-hover: #219955;
-  
-  /* Status colors */
+
   --color-error: #ff0000;
   --color-error-bg: #ffdddd;
   --color-success-bg: #ddffdd;
   --color-success: #00aa00;
-  --color-pangram-bg: #fff2cc; 
+  --color-pangram-bg: #fff2cc;
   --color-pangram-text: #856404;
-  
-  /* Text & backgrounds */
+
   --color-bg: #f9f9f9;
   --color-text: #555;
   --color-text-light: #777;
@@ -225,7 +220,7 @@ button:active {
 }
 
 .copy-btn {
-  background-color: #2196F3;
+  background-color: #2196f3;
   color: white;
 }
 .copy-btn:hover {
@@ -336,4 +331,40 @@ button:active {
   .buttons-container {
     flex-direction: column;
   }
+}
+
+.solutions-section {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: var(--color-bg);
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.solutions-section h2 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: var(--color-primary);
+}
+.solutions-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.solution-item {
+  padding: 8px 12px;
+  background-color: var(--color-secondary);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--color-primary-text);
+  font-weight: bold;
+}
+.solution-item.pangram {
+  background-color: #ffdc5c;
+  color: #333;
+}
+.solution-item.found-word {
+  background-color: var(--color-primary);
+  color: white;
 }
