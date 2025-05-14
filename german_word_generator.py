@@ -94,6 +94,13 @@ def main():
         action="store_true",
         help="Generate one character set for each day of the current year",
     )
+    parser.add_argument(
+        "--month",
+        "-m",
+        type=int,
+        choices=range(1, 13),
+        help="Generate character sets for a specific month (1-12). Works only with --yearly",
+    )
     args = parser.parse_args()
 
     german_words = get_german_words(args.words)
@@ -102,8 +109,22 @@ def main():
 
     if args.yearly:
         current_year = datetime.datetime.now().year
-        start_date = datetime.date(current_year, 1, 1)
-        end_date = datetime.date(current_year, 12, 31)
+
+        if args.month:
+            start_date = datetime.date(current_year, args.month, 1)
+            if args.month == 12:
+                next_month_year = current_year + 1
+                next_month = 1
+            else:
+                next_month_year = current_year
+                next_month = args.month + 1
+            end_date = datetime.date(
+                next_month_year, next_month, 1
+            ) - datetime.timedelta(days=1)
+        else:
+            start_date = datetime.date(current_year, 1, 1)
+            end_date = datetime.date(current_year, 12, 31)
+
         current_date = start_date
 
         while current_date <= end_date:
