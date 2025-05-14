@@ -40,14 +40,12 @@ def find_character_set(word_file="german_words.txt", max_attempts=1000):
         attempts += 1
 
         german_chars = "abcdefghijklmnopqrstuvwxyzäöüß"
-        first_char = random.choice(german_chars)
 
-        other_chars = random.sample(german_chars, 6)
-        char_set = [first_char] + other_chars
+        char_set = random.sample(german_chars, 7)
 
         valid_words = []
         for word in german_words:
-            if can_form_word(word, char_set, first_char):
+            if can_form_word(word, char_set, char_set[0]):
                 valid_words.append(word)
                 if len(valid_words) >= 15:
                     return char_set, valid_words
