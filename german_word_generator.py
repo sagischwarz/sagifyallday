@@ -17,6 +17,10 @@ def can_form_word(word, characters, first_char):
     return True
 
 
+def uses_all_characters(word, characters):
+    return all(char in word for char in characters)
+
+
 def get_german_words(file_path="german_words.txt"):
     try:
         with open(file_path, "r", encoding="utf-8") as file:
@@ -31,7 +35,9 @@ def get_german_words(file_path="german_words.txt"):
         return []
 
 
-def find_character_set(word_file="german_words.txt", max_attempts=1000):
+def find_character_set(
+    word_file="german_words.txt", max_attempts=10000, needs_all_chars=True
+):
     german_words = get_german_words(word_file)
 
     attempts = 0
@@ -44,10 +50,15 @@ def find_character_set(word_file="german_words.txt", max_attempts=1000):
         char_set = random.sample(german_chars, 7)
 
         valid_words = []
+        has_word_with_all_chars = not needs_all_chars
+
         for word in german_words:
             if can_form_word(word, char_set, char_set[0]):
                 valid_words.append(word)
-                if len(valid_words) >= 15:
+                if uses_all_characters(word, char_set):
+                    has_word_with_all_chars = True
+
+                if len(valid_words) >= 15 and has_word_with_all_chars:
                     return char_set, valid_words
 
     return None, []
@@ -106,8 +117,13 @@ def main():
                 if args.verbose:
                     print(f"  First character (required): {char_set[0]}")
                     print(f"  Other characters (optional): {''.join(char_set[1:])}")
+                    all_char_words = [
+                        word
+                        for word in valid_words
+                        if uses_all_characters(word, char_set)
+                    ]
                     print(
-                        f"  Found {len(valid_words)} German words (minimum 4 characters)"
+                        f"  Found {len(valid_words)} German words (minimum 4 characters), {len(all_char_words)} using all 7 letters"
                     )
             else:
                 print(f"Could not find character set for {current_date.isoformat()}")
@@ -129,7 +145,8 @@ def main():
                         f"  Found {len(valid_words)} German words (minimum 4 characters):"
                     )
                     for j, word in enumerate(valid_words, 1):
-                        print(f"  {j}. {word}")
+                        uses_all = "✓" if uses_all_characters(word, char_set) else " "
+                        print(f"  {j}. {word} {uses_all}")
             else:
                 print(f"Could not find character set #{i + 1}")
                 break
