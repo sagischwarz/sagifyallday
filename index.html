@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="auto-theme">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,6 +14,19 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="theme-toggle">
+      <div class="toggle-buttons">
+        <button id="theme-light" class="theme-btn" title="Helles Theme">
+          <span class="theme-icon">☀️</span>
+        </button>
+        <button id="theme-auto" class="theme-btn active" title="Automatisches Theme (System)">
+          <span class="theme-icon">⚙️</span>
+        </button>
+        <button id="theme-dark" class="theme-btn" title="Dunkles Theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
     <h1>Sagify All Day</h1>
     <div class="game-container">
       <div class="info">
@@ -743,6 +756,61 @@
           messageEl.classList.remove("visible");
         }, 3000);
       }
+
+      function initializeTheme() {
+        const btnAuto = document.getElementById('theme-auto');
+        const btnLight = document.getElementById('theme-light');
+        const btnDark = document.getElementById('theme-dark');
+        const htmlElement = document.documentElement;
+        
+        const savedTheme = localStorage.getItem('sagifyTheme') || 'auto';
+        
+        setTheme(savedTheme);
+        updateActiveButton(savedTheme);
+        
+        btnAuto.addEventListener('click', function() {
+          setTheme('auto');
+          updateActiveButton('auto');
+          localStorage.setItem('sagifyTheme', 'auto');
+        });
+        
+        btnLight.addEventListener('click', function() {
+          setTheme('light');
+          updateActiveButton('light');
+          localStorage.setItem('sagifyTheme', 'light');
+        });
+        
+        btnDark.addEventListener('click', function() {
+          setTheme('dark');
+          updateActiveButton('dark');
+          localStorage.setItem('sagifyTheme', 'dark');
+        });
+      }
+      
+      function updateActiveButton(theme) {
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        const activeBtn = document.getElementById(`theme-${theme}`);
+        if (activeBtn) {
+          activeBtn.classList.add('active');
+        }
+      }
+      
+      function setTheme(theme) {
+        const htmlElement = document.documentElement;
+        
+        htmlElement.classList.remove('auto-theme', 'dark-theme');
+        
+        if (theme === 'auto') {
+          htmlElement.classList.add('auto-theme');
+        } else if (theme === 'dark') {
+          htmlElement.classList.add('dark-theme');
+        }
+      }
+      
+      document.addEventListener('DOMContentLoaded', initializeTheme);
     </script>
   </body>
 </html>

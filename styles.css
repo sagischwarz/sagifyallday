@@ -1,27 +1,152 @@
 :root {
-  --color-primary: #f721b0;
-  --color-primary-hover: #ff5dc8;
-  --color-primary-text: #333;
+  --light-color-primary: #f721b0;
+  --light-color-primary-hover: #ff5dc8;
+  --light-color-primary-text: #333;
+  --light-color-secondary: #e6e6e6;
+  --light-color-secondary-hover: #d9d9d9;
+  --light-color-solutions: #27ae60;
+  --light-color-solutions-hover: #219955;
+  --light-color-error: #ff0000;
+  --light-color-error-bg: #ffdddd;
+  --light-color-success-bg: #ddffdd;
+  --light-color-success: #00aa00;
+  --light-color-pangram-bg: #fff2cc;
+  --light-color-pangram-text: #856404;
+  --light-color-bg: #f9f9f9;
+  --light-color-text: #555;
+  --light-color-text-light: #777;
+  --light-color-text-item: #333;
+  --light-color-item-bg: #f0f0f0;
+  --light-color-border: #ddd;
 
-  --color-secondary: #e6e6e6;
-  --color-secondary-hover: #d9d9d9;
+  --dark-color-primary: #f721b0;
+  --dark-color-primary-hover: #ff5dc8;
+  --dark-color-primary-text: #f0f0f0;
+  --dark-color-secondary: #444444;
+  --dark-color-secondary-hover: #555555;
+  --dark-color-solutions: #27ae60;
+  --dark-color-solutions-hover: #219955;
+  --dark-color-error: #ff5555;
+  --dark-color-error-bg: #552222;
+  --dark-color-success-bg: #225522;
+  --dark-color-success: #55cc55;
+  --dark-color-pangram-bg: #554422;
+  --dark-color-pangram-text: #ffcc55;
+  --dark-color-bg: #222222;
+  --dark-color-text: #dddddd;
+  --dark-color-text-light: #aaaaaa;
+  --dark-color-text-item: #f0f0f0;
+  --dark-color-item-bg: #333333;
+  --dark-color-border: #555555;
 
-  --color-solutions: #27ae60;
-  --color-solutions-hover: #219955;
+  --color-primary: var(--light-color-primary);
+  --color-primary-hover: var(--light-color-primary-hover);
+  --color-primary-text: var(--light-color-primary-text);
+  --color-secondary: var(--light-color-secondary);
+  --color-secondary-hover: var(--light-color-secondary-hover);
+  --color-solutions: var(--light-color-solutions);
+  --color-solutions-hover: var(--light-color-solutions-hover);
+  --color-error: var(--light-color-error);
+  --color-error-bg: var(--light-color-error-bg);
+  --color-success-bg: var(--light-color-success-bg);
+  --color-success: var(--light-color-success);
+  --color-pangram-bg: var(--light-color-pangram-bg);
+  --color-pangram-text: var(--light-color-pangram-text);
+  --color-bg: var(--light-color-bg);
+  --color-text: var(--light-color-text);
+  --color-text-light: var(--light-color-text-light);
+  --color-text-item: var(--light-color-text-item);
+  --color-item-bg: var(--light-color-item-bg);
+  --color-border: var(--light-color-border);
+}
 
-  --color-error: #ff0000;
-  --color-error-bg: #ffdddd;
-  --color-success-bg: #ddffdd;
-  --color-success: #00aa00;
-  --color-pangram-bg: #fff2cc;
-  --color-pangram-text: #856404;
+:root.dark-theme {
+  --color-primary: var(--dark-color-primary);
+  --color-primary-hover: var(--dark-color-primary-hover);
+  --color-primary-text: var(--dark-color-primary-text);
+  --color-secondary: var(--dark-color-secondary);
+  --color-secondary-hover: var(--dark-color-secondary-hover);
+  --color-solutions: var(--dark-color-solutions);
+  --color-solutions-hover: var(--dark-color-solutions-hover);
+  --color-error: var(--dark-color-error);
+  --color-error-bg: var(--dark-color-error-bg);
+  --color-success-bg: var(--dark-color-success-bg);
+  --color-success: var(--dark-color-success);
+  --color-pangram-bg: var(--dark-color-pangram-bg);
+  --color-pangram-text: var(--dark-color-pangram-text);
+  --color-bg: var(--dark-color-bg);
+  --color-text: var(--dark-color-text);
+  --color-text-light: var(--dark-color-text-light);
+  --color-text-item: var(--dark-color-text-item);
+  --color-item-bg: var(--dark-color-item-bg);
+  --color-border: var(--dark-color-border);
+}
 
-  --color-bg: #f9f9f9;
-  --color-text: #555;
-  --color-text-light: #777;
-  --color-text-item: #333;
-  --color-item-bg: #f0f0f0;
-  --color-border: #ddd;
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle-buttons {
+  display: flex;
+  background-color: var(--color-secondary);
+  border-radius: 20px;
+  padding: 3px;
+}
+
+.theme-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 15px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  transition: all 0.2s ease;
+}
+
+.theme-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-btn.active {
+  background-color: var(--color-primary);
+}
+
+.theme-icon {
+  font-size: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root.auto-theme {
+    --color-primary: var(--dark-color-primary);
+    --color-primary-hover: var(--dark-color-primary-hover);
+    --color-primary-text: var(--dark-color-primary-text);
+    --color-secondary: var(--dark-color-secondary);
+    --color-secondary-hover: var(--dark-color-secondary-hover);
+    --color-solutions: var(--dark-color-solutions);
+    --color-solutions-hover: var(--dark-color-solutions-hover);
+    --color-error: var(--dark-color-error);
+    --color-error-bg: var(--dark-color-error-bg);
+    --color-success-bg: var(--dark-color-success-bg);
+    --color-success: var(--dark-color-success);
+    --color-pangram-bg: var(--dark-color-pangram-bg);
+    --color-pangram-text: var(--dark-color-pangram-text);
+    --color-bg: var(--dark-color-bg);
+    --color-text: var(--dark-color-text);
+    --color-text-light: var(--dark-color-text-light);
+    --color-text-item: var(--dark-color-text-item);
+    --color-item-bg: var(--dark-color-item-bg);
+    --color-border: var(--dark-color-border);
+  }
 }
 
 body {
@@ -68,6 +193,7 @@ h1 {
   border-radius: 5px;
   font-family: inherit;
   color: var(--color-primary-text);
+  background-color: var(--color-bg);
 }
 .date-picker-container button {
   padding: 5px 10px;
@@ -136,6 +262,7 @@ h1 {
   width: 100%;
 }
 #word-input {
+  color: var(--color-primary-text);
   font-size: 24px;
   border: none;
   background-color: transparent;
@@ -266,6 +393,7 @@ button:active {
   font-weight: bold;
 }
 .score-section {
+  color: var(--color-primary-text);
   margin-top: 20px;
   display: flex;
   flex-direction: column;
@@ -330,6 +458,19 @@ button:active {
   }
   .buttons-container {
     flex-direction: column;
+  }
+  
+  .theme-toggle {
+    position: relative;
+    top: 0;
+    right: 0;
+    margin: 0 0 10px 0;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  h1 {
+    margin-top: 5px;
   }
 }
 
